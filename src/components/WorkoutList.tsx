@@ -1,21 +1,25 @@
-'use client'
+"use client"
 
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
+import { EXERCISES } from "@/data/exercises"
 
 interface Workout {
   id: number
   exercise: string
   sets: number
   reps: number
-  workout_date: string
+  weight?: number
+  duration?: number
+  notes?: string
+  date: string
 }
 
 export default function WorkoutList() {
   const { data: workouts, isLoading, isError } = useQuery<Workout[]>({
-    queryKey: ['workouts'],
+    queryKey: ["workouts"],
     queryFn: async () => {
-      const response = await axios.get('http://localhost:8000/workouts/')
+      const response = await axios.get("http://localhost:8000/workouts/")
       return response.data
     }
   })
@@ -24,16 +28,41 @@ export default function WorkoutList() {
   if (isError) return <div>Error loading workouts</div>
 
   return (
-    <div className="space-y-2">
-      {workouts?.map((workout) => (
-        <div key={workout.id} className="p-3 border rounded">
-          <h3 className="font-bold">{workout.exercise}</h3>
-          <p>Sets: {workout.sets} | Reps: {workout.reps}</p>
-          <p className="text-sm text-gray-500">
-            {new Date(workout.workout_date).toLocaleDateString()}
-          </p>
-        </div>
-      ))}
+    <div className="space-y-4 p-4">
+      {workouts?.map((workout) => {
+        const exerciseGroup = EXERCISES.find(g => 
+          g.exercises.includes(workout.exercise)
+        )
+        
+        return (
+          <div key={workout.id} className="p-4 border rounded-lg shadow-sm">
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <h3 className="text-lg font-semibold">{workout.exercise}</h3>
+                <p className="text-sm text-gray-500">
+                  {exerciseGroup?.type || "Custom Exercise"}
+                </p>
+              </div>
+              <span className="text-sm text-gray-500">
+                {new Date(workout.date).toLocaleDateString()}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <p>Sets: {workout.sets}</p>
+              <p>Reps: {workout.reps}</p>
+              {workout.weight && <p>Weight: {workout.weight}kg</p>}
+              {workout.duration && <p>Duration: {workout.duration} mins</p>}
+            </div>
+
+            {workout.notes && (
+              <div className="mt-2 p-2 bg-gray-50 rounded">
+                <p className="text-sm text-gray-600">{workout.notes}</p>
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
