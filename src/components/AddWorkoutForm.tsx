@@ -1,124 +1,147 @@
 "use client";
-
 import { useState } from 'react';
 import axios from 'axios';
-import { useQueryClient } from '@tanstack/react-query';
-import { EXERCISES } from '@/data/exercises';
+import { EXERCISES } from '../data/exercises';
 
-interface WorkoutForm {
-  exercise: string
-  sets: string
-  reps: string
-  weight: string  // Changed from optional to required
-  duration: string
-  notes: string
-}
+type WorkoutSet = {
+  exercise: string;
+  set_number: number;
+  reps: number;
+  weight: number;
+  day: string;
+  type: string;
+};
 
 export default function AddWorkoutForm() {
-  const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<WorkoutForm>({
-    exercise: '',
-    sets: '',
-    reps: '',
-    weight: '',       // Initialize with empty string
-    duration: '',     // Initialize with empty string
-    notes: ''         // Initialize with empty string
-  })
+  const [sets, setSets] = useState<WorkoutSet[]>([]);
+  const [selectedDay, setSelectedDay] = useState('');
+  const [currentExercise, setCurrentExercise] = useState('');
+  const [currentReps, setCurrentReps] = useState('');
+  const [currentWeight, setCurrentWeight] = useState('');
+  const [selectedExercise, setSelectedExercise] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await axios.post('http://localhost:8000/workouts/', {
-        exercise: formData.exercise,
-        sets: Number(formData.sets),
-        reps: Number(formData.reps),
-        weight: formData.weight ? Number(formData.weight) : null,
-        duration: formData.duration ? Number(formData.duration) : null,
-        notes: formData.notes,
-        date: new Date().toISOString()
-      });
-      queryClient.invalidateQueries({ queryKey: ['workouts'] });
-      setFormData({
-        exercise: '',
-        sets: '',
-        reps: '',
-        weight: '',
-        duration: '',
-        notes: ''
-      });
-    } catch (error) {
-      console.error('Error submitting workout:', error);
+  const getDayExercises = () => {
+    return EXERCISES.find(d => d.day === selectedDay)?.exercises || [];
+  };
+
+  const getWorkoutType = () => {
+    return EXERCISES.find(d => d.day === selectedDay)?.type || '';
+  };
+
+  const addSet = () => {
+    if (selectedDay && currentExercise && currentReps && currentWeight) {
+      const newSet: WorkoutSet = {
+        day: selectedDay,
+        type: getWorkoutType(),
+        exercise: currentExercise,
+        set_number: sets.filter(s => s.exercise === currentExercise).length + 1,
+        reps: parseInt(currentReps),
+        weight: parseFloat(currentWeight)
+      };
+      setSets([...sets, newSet]);
+      setCurrentExercise('');
+      setCurrentReps('');
+      setCurrentWeight('');
     }
   };
 
+// Change the submitWorkout function to:
+const submitWorkout = async () => {
+  try {
+    const setsWithDate = sets.map(set => ({
+      ...set,
+      date: new Date().toISOString()
+    }));
+    
+    await axios.post('http://localhost:8000/api/workouts/', setsWithDate, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    // Reset form
+    setSets([]);
+    setSelectedDay('');
+    setCurrentExercise('');
+    setCurrentReps('');
+    setCurrentWeight('');
+    
+    alert('Workout saved successfully!');
+  } catch (error) {
+    console.error('Error saving workout:', error);
+    alert('Error saving workout - check console for details');
+  }
+};
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-6">
-      {/* Exercise Dropdown */}
+    <div className="workout-form">
+      {/* Day Selection */}
       <select
-        value={formData.exercise}
-        onChange={(e) => setFormData({...formData, exercise: e.target.value})}
-        className="w-full p-2 border rounded"
-        required
+        value={selectedDay}
+        onChange={(e) => setSelectedDay(e.target.value)}
       >
-        <option value="">Select Exercise</option>
-        {EXERCISES.map((group) => (
-          <optgroup key={group.day} label={`${group.day} - ${group.type}`}>
-            {group.exercises.map((exercise) => (
-              <option key={exercise} value={exercise}>{exercise}</option>
-            ))}
-          </optgroup>
+        <option value="">Select Day</option>
+        {EXERCISES.map((dayGroup) => (
+          <option key={dayGroup.day} value={dayGroup.day}>
+            {dayGroup.day} - {dayGroup.type}
+          </option>
         ))}
       </select>
 
-      {/* Sets/Reps/Weight/Duration Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        <input
-          type="number"
-          placeholder="Sets"
-          value={formData.sets}
-          onChange={(e) => setFormData({...formData, sets: e.target.value})}
-          className="p-2 border rounded"
-          required
-        />
-        <input
-          type="number"
-          placeholder="Reps"
-          value={formData.reps}
-          onChange={(e) => setFormData({...formData, reps: e.target.value})}
-          className="p-2 border rounded"
-          required
-        />
-        <input
-          type="number"
-          placeholder="Weight (kg)"
-          value={formData.weight}
-          onChange={(e) => setFormData({...formData, weight: e.target.value})}
-          className="p-2 border rounded"
-        />
-        <input
-          type="number"
-          placeholder="Duration (minutes)"
-          value={formData.duration}
-          onChange={(e) => setFormData({...formData, duration: e.target.value})}
-          className="p-2 border rounded"
-        />
-      </div>
+      {/* Exercise Selection */}
+      <select
+        value={currentExercise}
+        onChange={(e) => setCurrentExercise(e.target.value)}
+        disabled={!selectedDay}
+      >
+        <option value="">Select Exercise</option>
+        {getDayExercises().map((exercise) => (
+          <option key={exercise} value={exercise}>
+            {exercise}
+          </option>
+        ))}
+      </select>
 
-      {/* Notes */}
-      <textarea
-        placeholder="Workout notes"
-        value={formData.notes}
-        onChange={(e) => setFormData({...formData, notes: e.target.value})}
-        className="w-full p-2 border rounded"
-        rows={3}
+      {/* Reps/Weight Inputs */}
+      <input
+        type="number"
+        placeholder="Reps"
+        value={currentReps}
+        onChange={(e) => setCurrentReps(e.target.value)}
+        disabled={!currentExercise}
+      />
+      
+      <input
+        type="number"
+        placeholder="Weight (lbs)"
+        value={currentWeight}
+        onChange={(e) => setCurrentWeight(e.target.value)}
+        disabled={!currentExercise}
       />
 
       <button 
-        type="submit" 
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        onClick={addSet}
+        disabled={!currentExercise || !currentReps || !currentWeight}
       >
-        Add Workout
+        Add Set
       </button>
-    </form>
-  )
+
+      {/* Sets Preview */}
+      <div className="sets-preview">
+        {sets.map((set, index) => (
+          <div key={index}>
+            {set.day} - {set.exercise} (Set {set.set_number}): 
+            {set.reps} reps @ {set.weight}lbs
+          </div>
+        ))}
+      </div>
+
+      <button 
+        onClick={submitWorkout}
+        disabled={sets.length === 0}
+      >
+        Save Workout
+      </button>
+    </div>
+  );
 }
