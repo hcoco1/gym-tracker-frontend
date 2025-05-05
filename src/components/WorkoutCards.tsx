@@ -1,8 +1,10 @@
 "use client";
-
-import React from "react";
 import axios from "axios";
+import { api, authHeaders } from "../lib/api";
 import type { WorkoutSet } from "../components/AddWorkoutForm";
+
+// Add auth hook
+import { useAuth } from "../hooks/useAuth";
 
 interface WorkoutCardsProps {
   workouts: WorkoutSet[];
@@ -10,15 +12,17 @@ interface WorkoutCardsProps {
 }
 
 const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
+  const { token, logout } = useAuth();
+
   const handleDelete = async (setId: number) => {
-    if (confirm("Are you sure you want to delete this set?")) {
-      try {
-        await axios.delete(`http://localhost:8000/workouts/${setId}`);
-        onDelete(setId);
-      } catch (error) {
-        console.error("Delete failed:", error);
-        alert("Failed to delete workout set");
-      }
+    try {
+      await axios.delete(
+        api.workouts.delete(setId),
+        authHeaders(token!)
+      );
+      onDelete(setId);
+    } catch (error) {
+      // ... error handling ...
     }
   };
 

@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { EXERCISES } from "../data/exercises";
 import WorkoutCards from "./WorkoutCards";
+import { api, authHeaders } from "../lib/api";
+// Add authentication state
+import { useAuth } from "../hooks/useAuth"; // We'll create this next
 
 export type WorkoutSet = {
   id?: number; // Add this line for the backend ID
@@ -24,18 +27,21 @@ export default function AddWorkoutForm() {
   const [availableExercises, setAvailableExercises] = useState<string[]>([]);
   const [workouts, setWorkouts] = useState<WorkoutSet[]>([]);
   const [currentExercise, setCurrentExercise] = useState("");
+  const { token, logout } = useAuth();
 
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/workouts/");
+        const response = await axios.get(api.workouts.getAll(), authHeaders(token!));
         setWorkouts(response.data);
       } catch (error) {
-        console.error("Error fetching workouts:", error);
+        // New users will have empty workout lists
+        setWorkouts([]); 
       }
     };
-    fetchWorkouts();
-  }, []);
+  
+    if (token) fetchWorkouts();
+  }, [token]);
 
   // Update available exercises when day changes
   useEffect(() => {
@@ -75,13 +81,9 @@ export default function AddWorkoutForm() {
       }));
 
       const response = await axios.post(
-        "http://localhost:8000/workouts/",
-        setsWithDate,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        api.workouts.create(),
+        sets,
+        authHeaders(token!)
       );
 
       // Update local state with returned data
