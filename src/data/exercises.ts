@@ -1,55 +1,60 @@
 export const EXERCISES = [
-    {
-      day: "Monday",
-      type: "Upper Body (Push)",
-      exercises: [
-        "Bench Press",
-        "Incline Dumbbell Press",
-        "Shoulder Press",
-        "Lateral Raise",
-        "Preacher Curl",
-        "Tricep Pushdown"
-      ]
-    },
-    {
-      day: "Tuesday",
-      type: "Lower Body + Core (Obliques)",
-      exercises: [
-        "Squat",
-        "RDL",
-        "Reverse Lunges",
-        "Leg Extensions",
-        "Glute Kickbacks",
-        "Calf Raises",
-        "High to low wood choppers",
-        "Bicycle crunch",
-        "Twisting leg raises",
-        "Russian twist"
-      ]
-    },
-    {
-      day: "Thursday",
-      type: "Upper Body (Pull)",
-      exercises: [
-        "Pull-Ups",
-        "Bent Over Row",
-        "Incline Curls",
-        "Skullcrushers",
-        "Rear Delt Flys"
-      ]
-    },
-    {
-      day: "Friday",
-      type: "Lower Body + Core (Abs)",
-      exercises: [
-        "Leg Press",
-        "Hip Thrust",
-        "Bulgarian Split Squat",
-        "Leg Curl",
-        "Abductor",
-        "Calf Raises",
-        "C-shaped reverse crunches",
-        "Rope cable crunch"
-      ]
-    }
-  ];
+  {
+    day: "Monday",
+    type: "Push (Chest, Shoulders, Triceps)",
+    exercises: [
+      "Incline Barbell Bench Press",
+      "Flat Dumbbell Press",
+      "Cable Chest Flys",
+      "Seated Dumbbell Shoulder Press",
+      "Lateral Raises",
+      "Triceps Rope Pushdown",
+      "Overhead Dumbbell Triceps Extension"
+    ]
+  },
+  {
+    day: "Tuesday",
+    type: "Pull (Back, Biceps)",
+    exercises: [
+      "Pull-Ups or Lat Pulldown",
+      "Bent Over Barbell Row",
+      "Seated Cable Row (Close Grip)",
+      "Face Pulls",
+      "Barbell or Dumbbell Curl",
+      "Incline Dumbbell Curls",
+      "Hammer Curls"
+    ]
+  },
+  {
+    day: "Thursday",
+    type: "Legs (Quads, Hamstrings, Glutes, Calves)",
+    exercises: [
+      "Barbell Back Squat",
+      "Romanian Deadlift (RDL)",
+      "Walking Lunges",
+      "Leg Press",
+      "Leg Curl Machine",
+      "Standing Calf Raise",
+      "Seated Calf Raise"
+    ]
+  },
+  {
+    day: "Friday",
+    type: "Core + Cardio",
+    exercises: [
+      "C-shaped reverse crunches",
+      "Rope cable crunch",
+      "Russian twists",
+      "High to low wood choppers",
+      "Bicycle crunch",
+      "Twisting leg raises",
+      "Russian twist",
+      "Hanging Leg Raises",
+      "Cable Woodchoppers",
+      "Weighted Decline Sit-ups",
+      "Plank",
+      "Ab Wheel Rollouts",
+      "20 min steady-state cardio"
+    ]
+  }
+];
