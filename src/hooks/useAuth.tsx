@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { api } from "@/lib/api";
 
+
 type AuthContextType = {
   token: string | null;
   login: (username: string, password: string) => Promise<boolean>;
@@ -17,10 +18,12 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
+  const [loading, setLoading] = useState(true); // NEW
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) setToken(storedToken);
+    setLoading(false); // NEW
   }, []);
 
   const login = async (username: string, password: string) => {
@@ -49,7 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (response.status === 200) {
-        // Automatically log in after successful registration
         return await login(username, password);
       }
       return false;
@@ -68,6 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     router.push("/login");
   };
+
+  if (loading) return null; // Prevent rendering before token is set
 
   return (
     <AuthContext.Provider value={{ token, login, register, logout }}>

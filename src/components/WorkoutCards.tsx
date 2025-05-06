@@ -2,8 +2,6 @@
 import axios from "axios";
 import { api, authHeaders } from "../lib/api";
 import type { WorkoutSet } from "../components/AddWorkoutForm";
-
-// Add auth hook
 import { useAuth } from "../hooks/useAuth";
 
 interface WorkoutCardsProps {
@@ -12,23 +10,27 @@ interface WorkoutCardsProps {
 }
 
 const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
-  const { token, logout } = useAuth();
+  const { token } = useAuth();
 
   const handleDelete = async (setId: number) => {
     try {
-      await axios.delete(
-        api.workouts.delete(setId),
-        authHeaders(token!)
-      );
+      await axios.delete(api.workouts.delete(setId), authHeaders(token!));
       onDelete(setId);
     } catch (error) {
-      // ... error handling ...
+      console.error("Delete failed:", error);
     }
   };
 
-  // Group workouts by date
+  // Group workouts by date with proper formatting
   const groupedWorkouts = workouts.reduce((acc, workout) => {
-    const date = workout.date ? new Date(workout.date).toLocaleDateString() : "Unknown Date";
+    const date = workout.date
+      ? new Date(workout.date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "Unknown Date";
+
     if (!acc[date]) {
       acc[date] = [];
     }
@@ -37,24 +39,28 @@ const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
   }, {} as Record<string, WorkoutSet[]>);
 
   return (
-    <div className="mt-8 space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Logged Workouts</h2>
-      
-      {Object.entries(groupedWorkouts).map(([date, workouts]) => (
+    <div className="mt-8 space-y-8">
+      <h2 className="text-xl font-semibold mb-4">Training Sessions</h2>
+
+      {Object.entries(groupedWorkouts).map(([date, dateWorkouts]) => (
         <div key={date} className="space-y-4">
-          <h3 className="font-medium text-gray-500 text-sm">{date}</h3>
+          {/* Date Header */}
+          <h3 className="text-lg font-semibold capitalize border-b pb-2">
+            {date}
+          </h3>
+
+          {/* Individual Cards */}
           <div className="grid gap-4">
-            {workouts.map((workout) => (
+            {dateWorkouts.map((workout) => (
               <div
-                key={`${date}-${workout.id}`}
+                key={workout.id}
                 className="p-4 bg-white rounded-lg border shadow-sm relative hover:shadow-md transition-shadow"
               >
-                {/* Workout Content */}
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="font-medium text-lg">{workout.exercise}</h3>
                     <p className="text-sm text-gray-500">
-                      {workout.day} - {workout.type}
+                      {workout.type} {/* Removed day from here */}
                     </p>
                   </div>
                   <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
@@ -62,16 +68,16 @@ const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-sm mb-6">
+                <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <span className="text-gray-500">Reps:</span> {workout.reps}
                   </div>
                   <div>
-                    <span className="text-gray-500">Weight:</span> {workout.weight} lbs
+                    <span className="text-gray-500">Weight:</span>{" "}
+                    {workout.weight} lbs
                   </div>
                 </div>
 
-                {/* Delete Button - Moved to bottom right */}
                 {workout.id && (
                   <button
                     onClick={() => handleDelete(workout.id!)}
