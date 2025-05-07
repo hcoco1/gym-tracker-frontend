@@ -70,9 +70,9 @@ const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
                     {/* Exercise Header */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-1">
                       <h4 className="text-sm font-semibold text-gray-800">{exercise}</h4>
-                      <span className="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded-full">
+{/*                       <span className="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded-full">
                         {sets[0].type}
-                      </span>
+                      </span> */}
                     </div>
 
                     {/* Sets List */}
