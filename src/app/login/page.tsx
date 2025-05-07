@@ -25,6 +25,7 @@ export default function LoginPage() {
         setError("Invalid username or password");
       }
     } catch (err) {
+      console.error('Login failed:', err);
       setError("Failed to login. Please try again later.");
     } finally {
       setIsLoading(false);
@@ -79,7 +80,7 @@ export default function LoginPage() {
         </button>
 
         <div className="text-center text-sm mt-4">
-          <span className="text-gray-600">Don't have an account? </span>
+          <span className="text-gray-600"> Don&apos;t have an account?{' '} </span>
           <Link 
             href="/register" 
             className="text-blue-500 hover:underline"
