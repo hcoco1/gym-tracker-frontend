@@ -25,10 +25,11 @@ const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
   const groupedWorkouts = workouts.reduce((acc, workout) => {
     const date = workout.date
       ? new Date(workout.date).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+          weekday: 'short',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).replace(/,/, '') // Formats as "Mon 05/07/2023"
       : "Unknown Date";
 
     if (!acc[date]) {
@@ -44,49 +45,47 @@ const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
   }, {} as Record<string, Record<string, WorkoutSet[]>>);
 
   return (
-    <div className="mt-8 space-y-8 px-4">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Training Sessions</h2>
+    <div className="mt-6 space-y-6 px-4">
+      <h2 className="text-lg font-bold mb-4 text-gray-800">Training Sessions</h2>
 
       {Object.entries(groupedWorkouts).map(([date, exercises]) => (
         <div key={date} className="space-y-4">
           {/* Date Parent Card */}
-          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">
-              {date}
-            </h3>
+          <div className="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-md font-semibold text-gray-700">{date}</h3>
+              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                Training Day
+              </span>
+            </div>
 
             {/* Exercise Cards */}
             {Object.entries(exercises).map(([exercise, sets]) => (
-              <div key={exercise} className="mb-6 last:mb-0">
-                <div className="bg-gray-50 p-4 md:p-5 rounded-lg">
+              <div key={exercise} className="mb-4 last:mb-0">
+                <div className="bg-gray-50 p-3 md:p-4 rounded-md">
                   {/* Exercise Header */}
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
-                    <h4 className="text-md font-semibold text-gray-800">{exercise}</h4>
-                    <span className="text-sm text-gray-600 bg-gray-200 px-3 py-1 rounded-full">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-1">
+                    <h4 className="text-sm font-semibold text-gray-800">{exercise}</h4>
+                    <span className="text-xs text-gray-600 bg-gray-200 px-2 py-1 rounded-full">
                       {sets[0].type}
                     </span>
                   </div>
 
                   {/* Sets List */}
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {sets.map((set) => (
                       <div
                         key={set.id}
-                        className="p-3 bg-white rounded-lg border border-gray-200 flex justify-between items-center transition-colors hover:border-gray-300"
+                        className="p-2 bg-white rounded-md border border-gray-200 flex justify-between items-center transition-colors hover:border-gray-300"
                       >
                         <div className="flex-1">
-                          <div className="flex flex-wrap gap-x-4 gap-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-800">Set {set.set_number}</span>
-                              <span className="text-gray-400">|</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-600">Reps:</span>
-                              <span className="font-medium text-gray-800">{set.reps}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-600">Weight:</span>
-                              <span className="font-medium text-gray-800">{set.weight} lbs</span>
+                          <div className="flex flex-wrap gap-x-3 gap-y-1 items-center text-sm">
+                            <span className="font-medium text-gray-800">Set {set.set_number}</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-gray-500">·</span>
+                              <span className="text-gray-600">{set.reps} reps</span>
+                              <span className="text-gray-500">·</span>
+                              <span className="text-gray-600">{set.weight} lbs</span>
                             </div>
                           </div>
                         </div>
@@ -94,12 +93,12 @@ const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
                         {set.id && (
                           <button
                             onClick={() => handleDelete(set.id!)}
-                            className="ml-4 text-red-500 hover:text-red-700 transition-colors"
+                            className="ml-2 text-red-500 hover:text-red-700 transition-colors"
                             title="Delete set"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
+                              className="h-4 w-4"
                               viewBox="0 0 20 20"
                               fill="currentColor"
                             >
@@ -122,7 +121,7 @@ const WorkoutCards = ({ workouts, onDelete }: WorkoutCardsProps) => {
       ))}
 
       {workouts.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-6 text-gray-500 text-sm">
           No workouts logged yet. Add your first set!
         </div>
       )}
