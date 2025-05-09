@@ -22,7 +22,7 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-bold">Workouts</h1>
         <button
           onClick={logout}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+          className="px-4 py-2 bg-red-300 text-white rounded hover:bg-red-800 transition-colors"
         >
           Logout
         </button>
