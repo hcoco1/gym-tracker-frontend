@@ -19,7 +19,7 @@ export default function DashboardPage() {
   return (
     <main className="max-w-2xl mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Workout Dashboard</h1>
+        <h1 className="text-2xl font-bold">Workouts</h1>
         <button
           onClick={logout}
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"

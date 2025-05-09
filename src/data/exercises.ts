@@ -16,7 +16,7 @@ export const EXERCISES = [
     day: "Tuesday",
     type: "Pull",
     exercises: [
-      "Pull-Ups or Lat Pulldown",
+      "Pull-Ups",
       "Bent Over Barbell Row",
       "Seated Cable Row (Close Grip)",
       "Face Pulls",
@@ -54,7 +54,7 @@ export const EXERCISES = [
       "Weighted Decline Sit-ups",
       "Plank",
       "Ab Wheel Rollouts",
-      "20 min steady-state cardio"
+      "20 min cardio"
     ]
   }
 ];
